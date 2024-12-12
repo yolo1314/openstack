@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>访问API</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 用户凭证</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+    </div>
+</div>
+<script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script th:inline="none">
+    layui.use(['table'], function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '../keystone/catalog.json',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: [],
+            cols: [[
+                {field: 'id', title: 'ID'},
+                {field: 'name', title: '服务'},
+                {field: 'endpoint', title: '服务端点',
+                    templet: function (d) {
+                        return d.endpoints[0].url
+                    }
+                },
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: false,
+            skin: 'line'
+        });
+
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['80%', '80%'],
+                    content: '../keystone/credential',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
